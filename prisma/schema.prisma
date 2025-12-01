@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String?
+  email         String   @unique
+  emailVerified DateTime?
+  image         String?
+  role          String   @default("student") // "admin" or "student"
+  createdAt     DateTime @default(now())
+  sessions      Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  category    String
+  description String
+  thumbnail   String
+  published   Boolean  @default(false)
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  courseId  String
+  title     String
+  videoUrl  String
+  duration  Int?     // seconds (optional)
+  position  Int      @default(0)
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
